@@ -1,61 +1,72 @@
-const formWrapper = document.querySelector('.form-wrapper');
 const form = document.querySelector('#form');
 const input = document.querySelector('#searchInput');
-const buttonWrapper = document.querySelector('.button-wrapper');
-const searchBtn = document.querySelector('#searchBtn');
 const clearBtn = document.querySelector('#clearBtn');
-const imageListWrapper = document.querySelector('.image-wrapper');
+const imageListWrapper = document.querySelector('.imageList-wrapper');
 
-
-runEventListeners();
+document.addEventListener("DOMContentLoaded", () => {
+    runEventListeners();
+});
 
 function runEventListeners() {
-    form.addEventListener('submit', search);
-    clearBtn.addEventListener('click', clear);
-    }
-
+    if (form) form.addEventListener('submit', search);
+    if (clearBtn) clearBtn.addEventListener('click', clear);
+}
 
 function clear(e) {
-    imageListWrapper.innerHTML = '';
+    if (imageListWrapper) {
+        imageListWrapper.innerHTML = '';
+    }
     input.value = '';
     e.preventDefault();
 }
 
 function search(e) {
     const value = input.value.trim();
+    if (!value) {
+        alert("Please enter a search term.");
+        e.preventDefault();
+        return;
+    }
+
     fetch(`https://api.unsplash.com/search/photos?query=${value}`, {
         method: 'GET',
         headers: {
-            Authorization: 'Client-ID Y-n0PJztlyL4P3CIYqYhZTtpvfbGW8Ket2uVfH3j4fw'
-    }
-})
-.then(response => response.json())
-.then(data => {
-    Array.from(data.results).forEach(item => {
-       //console.log(item.urls.small);
-
-       addImageToUI(item.urls.small);
-
-    })})
-
-.catch(error => console.error(error));
+            Authorization: 'Client-ID Y-n0PJztlyL4P3CIYqYhZTtpvfbGW8Ket2uVfH3j4fw',
+        },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.results || data.results.length === 0) {
+                alert("No images found. Try a different search term.");
+                return;
+            }
+            Array.from(data.results).forEach(item => {
+                addImageToUI(item.urls.small);
+            });
+        })
+        .catch(error => console.error(error));
 
     e.preventDefault();
-
 }
 
-function addImageToUI(url){
-    //console.log(imageListWrapper);
+function addImageToUI(url) {
+    if (!imageListWrapper) {
+        console.error("Image list wrapper not found in the DOM!");
+        return;
+    }
     const div = document.createElement('div');
-    div.className='card';
+    div.className = 'card';
 
     const img = document.createElement('img');
     img.setAttribute('src', url);
-    img.height = `400`;
-    img.width = `400`;
+    img.height = 400;
+    img.width = 400;
 
     div.append(img);
     imageListWrapper.append(div);
-
-
 }
