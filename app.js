@@ -28,7 +28,7 @@ function search(e) {
         return;
     }
 
-    fetch(`https://api.unsplash.com/search/photos?query=${value}`, {
+    fetch(`https://api.unsplash.com/search/photos?query=${value}&per_page=30`, {
         method: 'GET',
         headers: {
             Authorization: 'Client-ID Y-n0PJztlyL4P3CIYqYhZTtpvfbGW8Ket2uVfH3j4fw',
@@ -46,7 +46,7 @@ function search(e) {
                 return;
             }
             Array.from(data.results).forEach(item => {
-                addImageToUI(item.urls.small);
+                addImageToUI(item.urls.small, item.urls.full, item.links.download);
             });
         })
         .catch(error => console.error(error));
@@ -54,7 +54,7 @@ function search(e) {
     e.preventDefault();
 }
 
-function addImageToUI(url) {
+function addImageToUI(smallUrl, fullUrl, downloadUrl) {
     if (!imageListWrapper) {
         console.error("Image list wrapper not found in the DOM!");
         return;
@@ -62,11 +62,65 @@ function addImageToUI(url) {
     const div = document.createElement('div');
     div.className = 'card';
 
+    // Create the image element
     const img = document.createElement('img');
-    img.setAttribute('src', url);
+    img.setAttribute('src', smallUrl);
     img.height = 400;
     img.width = 400;
+
+    // Add click event to open the full version
+    img.addEventListener('click', () => openFullImage(fullUrl, downloadUrl));
 
     div.append(img);
     imageListWrapper.append(div);
 }
+
+function openFullImage(fullUrl, downloadUrl) {
+    // Create a modal background
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    // Create the full-size image
+    const fullImage = document.createElement('img');
+    fullImage.setAttribute('src', fullUrl);
+    fullImage.className = 'modal-image';
+
+    // Create a download button
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'download-btn';
+    downloadBtn.textContent = 'Download';
+
+    // Add download functionality
+    downloadBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch(fullUrl);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = 'image.jpg'; // File name for the downloaded image
+            link.click();
+
+            // Clean up the object URL
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error('Download failed:', error);
+        }
+    });
+
+    // Create a close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-btn';
+    closeBtn.textContent = 'Close';
+
+    // Close the modal and clean up
+    closeBtn.addEventListener('click', () => modal.remove());
+
+    // Append elements to the modal
+    modal.append(fullImage);
+    modal.append(downloadBtn);
+    modal.append(closeBtn);
+    document.body.append(modal);
+}
+

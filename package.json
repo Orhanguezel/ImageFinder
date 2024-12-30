@@ -1,0 +1,24 @@
+{
+  "name": "imagefinder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gh-pages -d ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Orhanguezel/ImageFinder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Orhanguezel/ImageFinder/issues"
+  },
+  "homepage": "https://github.com/Orhanguezel/ImageFinder#readme",
+  "devDependencies": {
+    "gh-pages": "^6.2.0"
+  }
+}
