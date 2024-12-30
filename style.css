@@ -187,3 +187,8 @@ body {
 .close-btn:hover {
     background-color: #a71d2a;
 }
+
+/* Responsif */
+@media screen and (max-width: 768px) {
+
+}
